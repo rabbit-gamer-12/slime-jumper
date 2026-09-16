@@ -3,6 +3,10 @@ namespace SpriteKind {
     export const orb_of_points = SpriteKind.create()
     export const duble_jump = SpriteKind.create()
 }
+namespace StatusBarKind {
+    export const animate = StatusBarKind.create()
+    export const animate2 = StatusBarKind.create()
+}
 scene.onOverlapTile(SpriteKind.Player, assets.tile`more`, function (sprite2, location) {
     sprites.destroy(mySprite)
     tiles.setTileAt(location, assets.tile`transparency16`)
@@ -34,6 +38,12 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
     if (map2 == 1) {
         map1score = info.score()
         map1highscore = high_score
+    } else if (map2 == 2) {
+        map2score = info.score()
+        map2highscore = high_score
+    } else if (map2 == 3) {
+        map3score = info.score()
+        map3highscore = high_score
     }
     Reset()
     tile_map()
@@ -50,48 +60,76 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
         LAVA()
     }
 })
-sprites.onOverlap(SpriteKind.Player, SpriteKind.duble_jump, function (sprite, otherSprite) {
+scene.onOverlapTile(SpriteKind.Player, assets.tile`portal3`, function (sprite32, location22) {
+    map2 = 3
+    gravity = 1
+    next2()
+    if (map3highscore > 0) {
+        high_score = map3highscore
+    }
+    if (map3score > 0) {
+        info.setScore(map3score)
+    }
+    timer = game.askForNumber("how much time do you want?", 2)
+    if (high_score > 0) {
+        game.splash("your high score is:", high_score)
+    }
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.duble_jump, function (sprite3, otherSprite) {
     Double_jump += 1
+    animateslime += 1
     sprites.destroy(otherSprite, effects.disintegrate, 500)
 })
 info.onCountdownEnd(function () {
+    info.setScore(0)
     Clear()
     lava = 0
-    Orb_points = 0
-    info.setScore(0)
+    Double_jump = 0
+    animateslime = 0
     game.splash("GAME OVER")
-    start()
-})
-scene.onOverlapTile(SpriteKind.Player, assets.tile`portal1`, function (sprite3, location2) {
-    map2 = 1
-    gravity = 1
+    game.splash("high score", high_score)
     next2()
-    if (map1highscore > 0) {
-        high_score = map1highscore
-    }
-    if (map1score > 0) {
-        info.setScore(map1score)
-    }
-    timer = game.askForNumber("how much time do you want?", 2)
-    game.splash("your high score is:", high_score)
 })
 function power_up () {
-    for (let value3 of tiles.getTilesByType(assets.tile`myTile4`)) {
-        jump_orb = sprites.create(assets.image`double jump orb`, SpriteKind.duble_jump)
-        tiles.placeOnTile(jump_orb, value3)
-        tiles.setTileAt(value3, assets.tile`transparency16`)
-        animation.runImageAnimation(
-        jump_orb,
-        assets.animation`animated power up`,
-        125,
-        true
-        )
-        animation.runMovementAnimation(
-        jump_orb,
-        animation.animationPresets(animation.bobbing),
-        2000,
-        true
-        )
+    if (map2 == 1) {
+        for (let index = 0; index < 4; index++) {
+            jump_orb = sprites.create(assets.image`double jump orb`, SpriteKind.duble_jump)
+            tiles.placeOnRandomTile(jump_orb, assets.tile`myTile4`)
+            animation.runImageAnimation(
+            jump_orb,
+            assets.animation`animated power up`,
+            125,
+            true
+            )
+            animation.runMovementAnimation(
+            jump_orb,
+            animation.animationPresets(animation.bobbing),
+            2000,
+            true
+            )
+            tiles.setTileAt(jump_orb.tilemapLocation(), assets.tile`transparency16`)
+        }
+    } else if (map2 > 1) {
+        for (let index = 0; index < 5; index++) {
+            jump_orb = sprites.create(assets.image`double jump orb`, SpriteKind.duble_jump)
+            tiles.placeOnRandomTile(jump_orb, assets.tile`myTile4`)
+            animation.runImageAnimation(
+            jump_orb,
+            assets.animation`animated power up`,
+            125,
+            true
+            )
+            animation.runMovementAnimation(
+            jump_orb,
+            animation.animationPresets(animation.bobbing),
+            2000,
+            true
+            )
+            tiles.setTileAt(jump_orb.tilemapLocation(), assets.tile`transparency16`)
+        }
+    }
+    for (let value of tiles.getTilesByType(assets.tile`myTile4`)) {
+        tiles.setTileAt(value, assets.tile`transparency16`)
     }
 }
 function slime () {
@@ -99,8 +137,8 @@ function slime () {
     scene.cameraFollowSprite(mySprite)
     GRAVITY()
     tiles.placeOnRandomTile(mySprite, assets.tile`myTile2`)
-    for (let value of tiles.getTilesByType(assets.tile`myTile2`)) {
-        tiles.setTileAt(value, assets.tile`transparency16`)
+    for (let value2 of tiles.getTilesByType(assets.tile`myTile2`)) {
+        tiles.setTileAt(value2, assets.tile`transparency16`)
     }
 }
 function tile_map () {
@@ -229,7 +267,7 @@ function tile_map () {
             9999999999999666666666666666666666666666667777777769999999999999999999999999999999999999999996666666666666666666666666666677777777699999999999999999999999999999
             `)
     } else if (map2 == 1) {
-        tiles.setCurrentTilemap(tilemap`level`)
+        tiles.setCurrentTilemap(tilemap`map0`)
         scene.setBackgroundImage(img`
             444444444444444444444444444444444444444444444fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff44444444444444444444444444444444444444444444444444
             444444444444444444444444444444444444444444444fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff44444444444444444444444444444444444444444444444444
@@ -482,6 +520,12 @@ function tile_map () {
             444444444444444444444444444444444444444444444fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
             444444444444444444444444444444444444444444444fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
             `)
+    } else if (map2 == 2) {
+        tiles.setCurrentTilemap(tilemap`map2`)
+        scene.setBackgroundImage(assets.image`myImage2`)
+    } else if (map2 == 3) {
+        tiles.setCurrentTilemap(tilemap`map3`)
+        scene.setBackgroundImage(assets.image`myImage4`)
     }
 }
 function Sprits () {
@@ -489,6 +533,36 @@ function Sprits () {
     POINT_ORBS()
     power_up()
 }
+scene.onOverlapTile(SpriteKind.Player, assets.tile`portal2`, function (sprite, location2) {
+    map2 = 2
+    gravity = 1
+    next2()
+    if (map2highscore > 0) {
+        high_score = map2highscore
+    }
+    if (map2score > 0) {
+        info.setScore(map2score)
+    }
+    timer = game.askForNumber("how much time do you want?", 2)
+    if (high_score > 0) {
+        game.splash("your high score is:", high_score)
+    }
+})
+scene.onOverlapTile(SpriteKind.Player, assets.tile`portal1`, function (sprite32, location22) {
+    map2 = 1
+    gravity = 1
+    next2()
+    if (map1highscore > 0) {
+        high_score = map1highscore
+    }
+    if (map1score > 0) {
+        info.setScore(map1score)
+    }
+    timer = game.askForNumber("how much time do you want?", 2)
+    if (high_score > 0) {
+        game.splash("your high score is:", high_score)
+    }
+})
 function LAVA () {
     if (lava == 0) {
         info.startCountdown(timer)
@@ -497,6 +571,7 @@ function LAVA () {
 }
 function Reset () {
     mySprite.setImage(assets.image`slime idle`)
+    animateslime = 0
     Double_jump = 0
     lava = 0
     map2 = 0
@@ -508,10 +583,10 @@ function Reset () {
     Clear()
 }
 function POINT_ORBS () {
-    for (let value2 of tiles.getTilesByType(assets.tile`point orb`)) {
+    for (let value22 of tiles.getTilesByType(assets.tile`point orb`)) {
         Point_orb = sprites.create(assets.image`point orb sprite`, SpriteKind.orb_of_points)
-        tiles.placeOnTile(Point_orb, value2)
-        tiles.setTileAt(value2, assets.tile`transparency16`)
+        tiles.placeOnTile(Point_orb, value22)
+        tiles.setTileAt(value22, assets.tile`transparency16`)
         animation.runImageAnimation(
         Point_orb,
         assets.animation`myAnim`,
@@ -534,9 +609,14 @@ function GRAVITY () {
 }
 let Point_orb: Sprite = null
 let jump_orb: Sprite = null
+let animateslime = 0
 let timer = 0
 let gravity = 0
 let Double_jump = 0
+let map3highscore = 0
+let map3score = 0
+let map2highscore = 0
+let map2score = 0
 let map1highscore = 0
 let map1score = 0
 let map2 = 0
@@ -550,6 +630,31 @@ high_score = 0
 game.splash("welcome to slime jumper")
 start()
 game.onUpdate(function () {
+    if (animateslime == 1 && Double_jump == 1) {
+        animation.runImageAnimation(
+        mySprite,
+        assets.animation`myAnim1`,
+        50,
+        false
+        )
+        animateslime += 1
+    } else if (animateslime == 3 && Double_jump == 2) {
+        animation.runImageAnimation(
+        mySprite,
+        assets.animation`myAnim3`,
+        50,
+        false
+        )
+        animateslime += 1
+    }
+    if (Double_jump == 0) {
+        animateslime = 0
+    }
+    if (Double_jump == 1) {
+        animateslime = 2
+    }
+})
+game.onUpdateInterval(100, function () {
     if (Double_jump == 0) {
         if (mySprite.vy > 0) {
             mySprite.setImage(assets.image`slime down`)
@@ -568,7 +673,7 @@ game.onUpdate(function () {
         } else {
             mySprite.setImage(assets.image`slime idle`)
         }
-    } else if (Double_jump > 0) {
+    } else if (Double_jump == 1) {
         if (mySprite.vy > 0) {
             mySprite.setImage(assets.image`slime down2`)
         } else if (controller.right.isPressed()) {
@@ -585,6 +690,24 @@ game.onUpdate(function () {
             mySprite.setImage(assets.image`slime up2`)
         } else {
             mySprite.setImage(assets.image`slime idle2`)
+        }
+    } else if (Double_jump > 1) {
+        if (mySprite.vy > 0) {
+            mySprite.setImage(assets.image`slime down0`)
+        } else if (controller.right.isPressed()) {
+            mySprite.setImage(assets.image`slime right0`)
+            if (map2 > 0) {
+                LAVA()
+            }
+        } else if (controller.left.isPressed()) {
+            mySprite.setImage(assets.image`slime left0`)
+            if (map2 > 0) {
+                LAVA()
+            }
+        } else if (mySprite.vy < 0) {
+            mySprite.setImage(assets.image`slime up0`)
+        } else {
+            mySprite.setImage(assets.image`slime idle0`)
         }
     }
 })

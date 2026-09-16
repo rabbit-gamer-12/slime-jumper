@@ -1,8 +1,10 @@
 {
-    "name": "slime jumper",
+    "name": "slime jumper (newest)",
     "description": "",
     "dependencies": {
-        "device": "*"
+        "device": "*",
+        "pxt-status-bar": "github:jwunderl/pxt-status-bar#v0.4.2",
+        "arcade-character-animations": "github:microsoft/arcade-character-animations#v0.0.2"
     },
     "files": [
         "main.blocks",
@@ -19,7 +21,7 @@
         "test.ts"
     ],
     "targetVersions": {
-        "target": "2.0.63",
+        "target": "4.1.25",
         "targetId": "arcade"
     },
     "supportedTargets": [

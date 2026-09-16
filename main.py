@@ -3,95 +3,10 @@ class SpriteKind:
     LaVa = SpriteKind.create()
     orb_of_points = SpriteKind.create()
     duble_jump = SpriteKind.create()
-def Clear():
-    sprites.destroy_all_sprites_of_kind(SpriteKind.player)
-    sprites.destroy_all_sprites_of_kind(SpriteKind.orb_of_points)
-    sprites.destroy_all_sprites_of_kind(SpriteKind.duble_jump)
-def next2():
-    Clear()
-    tile_map()
-    Sprits()
-
-def on_b_pressed():
-    global map1score, map1highscore
-    if map2 == 1:
-        map1score = info.score()
-        map1highscore = high_score
-    Reset()
-    tile_map()
-    slime()
-controller.B.on_event(ControllerButtonEvent.PRESSED, on_b_pressed)
-
-def POINT_ORBS():
-    global Point_orb
-    for value2 in tiles.get_tiles_by_type(assets.tile("""
-        point orb
-        """)):
-        Point_orb = sprites.create(assets.image("""
-                point orb sprite
-                """),
-            SpriteKind.orb_of_points)
-        tiles.place_on_tile(Point_orb, value2)
-        tiles.set_tile_at(value2, assets.tile("""
-            transparency16
-            """))
-        animation.run_image_animation(Point_orb,
-            assets.animation("""
-                myAnim
-                """),
-            200,
-            True)
-
-def on_a_pressed():
-    global Double_jump
-    if map2 > 0:
-        if mySprite.vy == 0:
-            mySprite.vy = -200
-        elif Double_jump > 0:
-            mySprite.vy = -200
-            Double_jump += -1
-        LAVA()
-controller.A.on_event(ControllerButtonEvent.PRESSED, on_a_pressed)
-
-def on_on_overlap(sprite, otherSprite):
-    global Double_jump
-    Double_jump += 1
-    sprites.destroy(otherSprite, effects.disintegrate, 500)
-sprites.on_overlap(SpriteKind.player, SpriteKind.duble_jump, on_on_overlap)
-
-def on_countdown_end():
-    global lava, Orb_points
-    Clear()
-    lava = 0
-    Orb_points = 0
-    info.set_score(0)
-    game.splash("GAME OVER")
-    start()
-info.on_countdown_end(on_countdown_end)
-
-def power_up():
-    global double_jump
-    for value3 in tiles.get_tiles_by_type(assets.tile("""
-        myTile4
-        """)):
-        double_jump = sprites.create(assets.image("""
-                double jump orb
-                """),
-            SpriteKind.duble_jump)
-        tiles.place_on_tile(double_jump, value3)
-        tiles.set_tile_at(value3, assets.tile("""
-            transparency16
-            """))
-        animation.run_image_animation(double_jump,
-            assets.animation("""
-                animated power up
-                """),
-            125,
-            True)
-        animation.run_movement_animation(double_jump,
-            animation.animation_presets(animation.bobbing),
-            2000,
-            True)
+@namespace
+class StatusBarKind:
+    animate = StatusBarKind.create()
+    animate2 = StatusBarKind.create()
 
 def on_overlap_tile(sprite2, location):
     global Orb_points, high_score, lava
@@ -113,23 +28,97 @@ scene.on_overlap_tile(SpriteKind.player,
         """),
     on_overlap_tile)
 
-def on_overlap_tile2(sprite3, location2):
-    global map2, gravity, high_score, timer
-    map2 = 1
-    gravity = 1
-    next2()
-    if map1highscore > 0:
-        high_score = map1highscore
-    if map1score > 0:
-        info.set_score(map1score)
-    timer = game.ask_for_number("how much time do you want?", 2)
-    game.splash("your high score is:", high_score)
-scene.on_overlap_tile(SpriteKind.player,
-    assets.tile("""
-        portal1
-        """),
-    on_overlap_tile2)
+def on_on_overlap(sprite4, otherSprite2):
+    global Orb_points
+    sprites.destroy(otherSprite2, effects.ashes, 500)
+    Orb_points += 1
+sprites.on_overlap(SpriteKind.player, SpriteKind.orb_of_points, on_on_overlap)
 
+def Clear():
+    sprites.destroy_all_sprites_of_kind(SpriteKind.player)
+    sprites.destroy_all_sprites_of_kind(SpriteKind.orb_of_points)
+    sprites.destroy_all_sprites_of_kind(SpriteKind.duble_jump)
+def next2():
+    Clear()
+    tile_map()
+    Sprits()
+
+def on_b_pressed():
+    global map1score, map1highscore, map2score, map2highscore, map3score, map3highscore
+    if map2 == 1:
+        map1score = info.score()
+        map1highscore = high_score
+    elif map2 == 2:
+        map2score = info.score()
+        map2highscore = high_score
+    elif map2 == 3:
+        map3score = info.score()
+        map3highscore = high_score
+    Reset()
+    tile_map()
+    slime()
+controller.B.on_event(ControllerButtonEvent.PRESSED, on_b_pressed)
+
+def on_a_pressed():
+    global Double_jump
+    if map2 > 0:
+        if mySprite.vy == 0:
+            mySprite.vy = -200
+        elif Double_jump > 0:
+            mySprite.vy = -200
+            Double_jump += -1
+        LAVA()
+controller.A.on_event(ControllerButtonEvent.PRESSED, on_a_pressed)
+
+def on_on_overlap2(sprite3, otherSprite):
+    global Double_jump, animateslime
+    Double_jump += 1
+    animateslime += 1
+    sprites.destroy(otherSprite, effects.disintegrate, 500)
+sprites.on_overlap(SpriteKind.player, SpriteKind.duble_jump, on_on_overlap2)
+
+def on_countdown_end():
+    global lava, Double_jump, animateslime
+    info.set_score(0)
+    Clear()
+    lava = 0
+    Double_jump = 0
+    animateslime = 0
+    game.splash("GAME OVER")
+    game.splash("high score", high_score)
+    next2()
+info.on_countdown_end(on_countdown_end)
+
+def power_up():
+    global jump_orb
+    for index in range(5):
+        jump_orb = sprites.create(assets.image("""
+                double jump orb
+                """),
+            SpriteKind.duble_jump)
+        tiles.place_on_random_tile(jump_orb, assets.tile("""
+            myTile4
+            """))
+        animation.run_image_animation(jump_orb,
+            assets.animation("""
+                animated power up
+                """),
+            125,
+            True)
+        animation.run_movement_animation(jump_orb,
+            animation.animation_presets(animation.bobbing),
+            2000,
+            True)
+        tiles.set_tile_at(jump_orb.tilemap_location(),
+            assets.tile("""
+                transparency16
+                """))
+    for value in tiles.get_tiles_by_type(assets.tile("""
+        myTile4
+        """)):
+        tiles.set_tile_at(value, assets.tile("""
+            transparency16
+            """))
 def slime():
     global mySprite
     mySprite = sprites.create(assets.image("""
@@ -140,10 +129,10 @@ def slime():
     tiles.place_on_random_tile(mySprite, assets.tile("""
         myTile2
         """))
-    for value in tiles.get_tiles_by_type(assets.tile("""
+    for value2 in tiles.get_tiles_by_type(assets.tile("""
         myTile2
         """)):
-        tiles.set_tile_at(value, assets.tile("""
+        tiles.set_tile_at(value2, assets.tile("""
             transparency16
             """))
 def tile_map():
@@ -275,7 +264,7 @@ def tile_map():
             """))
     elif map2 == 1:
         tiles.set_current_tilemap(tilemap("""
-            level
+            map0
             """))
         scene.set_background_image(img("""
             444444444444444444444444444444444444444444444fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff44444444444444444444444444444444444444444444444444
@@ -529,16 +518,60 @@ def tile_map():
             444444444444444444444444444444444444444444444fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
             444444444444444444444444444444444444444444444fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
             """))
+    elif map2 == 2:
+        tiles.set_current_tilemap(tilemap("""
+            map2
+            """))
+        scene.set_background_image(assets.image("""
+            myImage2
+            """))
+    elif map2 == 3:
+        tiles.set_current_tilemap(tilemap("""
+            level3
+            """))
+        scene.set_background_image(assets.image("""
+            myImage4
+            """))
 def Sprits():
     slime()
     POINT_ORBS()
     power_up()
 
-def on_on_overlap2(sprite4, otherSprite2):
-    global Orb_points
-    sprites.destroy(otherSprite2, effects.ashes, 500)
-    Orb_points += 1
-sprites.on_overlap(SpriteKind.player, SpriteKind.orb_of_points, on_on_overlap2)
+def on_overlap_tile2(sprite, location2):
+    global map2, gravity, high_score, timer
+    map2 = 2
+    gravity = 1
+    next2()
+    if map2highscore > 0:
+        high_score = map2highscore
+    if map2score > 0:
+        info.set_score(map2score)
+    timer = game.ask_for_number("how much time do you want?", 2)
+    if high_score > 0:
+        game.splash("your high score is:", high_score)
+scene.on_overlap_tile(SpriteKind.player,
+    assets.tile("""
+        portal2
+        """),
+    on_overlap_tile2)
+
+def on_overlap_tile3(sprite32, location22):
+    global map2, gravity, high_score, timer
+    map2 = 1
+    gravity = 1
+    next2()
+    if map1highscore > 0:
+        high_score = map1highscore
+    if map1score > 0:
+        info.set_score(map1score)
+    timer = game.ask_for_number("how much time do you want?", 2)
+    if high_score > 0:
+        game.splash("your high score is:", high_score)
+scene.on_overlap_tile(SpriteKind.player,
+    assets.tile("""
+        portal1
+        """),
+    on_overlap_tile3)
 
 def LAVA():
     global lava
@@ -546,10 +579,11 @@ def LAVA():
         info.start_countdown(timer)
         lava = 1
 def Reset():
-    global Double_jump, lava, map2, Orb_points, gravity, high_score
+    global animateslime, Double_jump, lava, map2, Orb_points, gravity, high_score
     mySprite.set_image(assets.image("""
         slime idle
         """))
+    animateslime = 0
     Double_jump = 0
     lava = 0
     map2 = 0
@@ -559,6 +593,25 @@ def Reset():
     info.set_score(0)
     info.stop_countdown()
     Clear()
+def POINT_ORBS():
+    global Point_orb
+    for value22 in tiles.get_tiles_by_type(assets.tile("""
+        point orb
+        """)):
+        Point_orb = sprites.create(assets.image("""
+                point orb sprite
+                """),
+            SpriteKind.orb_of_points)
+        tiles.place_on_tile(Point_orb, value22)
+        tiles.set_tile_at(value22, assets.tile("""
+            transparency16
+            """))
+        animation.run_image_animation(Point_orb,
+            assets.animation("""
+                myAnim
+                """),
+            200,
+            True)
 def start():
     tile_map()
     Sprits()
@@ -568,17 +621,22 @@ def GRAVITY():
         mySprite.ay = 320
     else:
         controller.move_sprite(mySprite)
+Point_orb: Sprite = None
 timer = 0
 gravity = 0
-double_jump: Sprite = None
-Orb_points = 0
-lava = 0
+jump_orb: Sprite = None
+animateslime = 0
 Double_jump = 0
-mySprite: Sprite = None
-Point_orb: Sprite = None
+map3highscore = 0
+map3score = 0
+map2highscore = 0
+map2score = 0
 map1highscore = 0
 map1score = 0
 map2 = 0
+lava = 0
+Orb_points = 0
+mySprite: Sprite = None
 high_score = 0
 music.play(music.string_playable("E B C5 A B G A F ", 120),
     music.PlaybackMode.LOOPING_IN_BACKGROUND)
@@ -588,6 +646,20 @@ game.splash("welcome to slime jumper")
 start()
 
 def on_on_update():
+    global animateslime
+    if animateslime == 1 and Double_jump == 1:
+        animation.run_image_animation(mySprite,
+            assets.animation("""
+                myAnim1
+                """),
+            50,
+            False)
+        animateslime += 1
+    if Double_jump == 0:
+        animateslime = 0
+game.on_update(on_on_update)
+
+def on_update_interval():
     if Double_jump == 0:
         if mySprite.vy > 0:
             mySprite.set_image(assets.image("""
@@ -638,4 +710,4 @@ def on_on_update():
             mySprite.set_image(assets.image("""
                 slime idle2
                 """))
-game.on_update(on_on_update)
+game.on_update_interval(100, on_update_interval)
